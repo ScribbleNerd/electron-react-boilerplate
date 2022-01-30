@@ -15,6 +15,7 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import touchbar from './touchbar';
 import { resolveHtmlPath } from './util';
 
 export default class AppUpdater {
@@ -63,6 +64,8 @@ const createWindow = async () => {
     await installExtensions();
   }
 
+  app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
@@ -73,8 +76,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 480,
+    height: 854,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -100,6 +103,8 @@ const createWindow = async () => {
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
+
+  mainWindow.setTouchBar(touchbar);
 
   // Open urls in the user's browser
   mainWindow.webContents.on('new-window', (event, url) => {
